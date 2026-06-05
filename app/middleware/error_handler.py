@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from app.utils.logger import get_logger
+import traceback
 
 logger = get_logger(__name__)
 
@@ -12,7 +13,11 @@ def setup_error_handlers(app: FastAPI):
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
-        logger.error(f"Validation error: {exc}")
+        """Handle validation errors"""
+        logger.warning(
+            f"Validation error on {request.method} {request.url.path}: {exc.errors()}"
+        )
+        logger.debug(f"Request body: {await request.body()}")
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
@@ -23,7 +28,12 @@ def setup_error_handlers(app: FastAPI):
 
     @app.exception_handler(Exception)
     async def general_exception_handler(request: Request, exc: Exception):
-        logger.error(f"Unhandled exception: {exc}")
+        """Handle general exceptions"""
+        logger.error(
+            f"Unhandled exception on {request.method} {request.url.path}: {str(exc)}",
+            exc_info=True,
+            extra={"traceback": traceback.format_exc()},
+        )
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={

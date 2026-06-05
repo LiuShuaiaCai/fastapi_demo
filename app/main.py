@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from app.config import settings
 from app.api.v1.router import router as v1_router
 from app.middleware.error_handler import setup_error_handlers
+from app.middleware.logging_middleware import LoggingMiddleware
 from app.database.session import engine
 from app.models.base import Base
 from app.utils.logger import get_logger
@@ -17,11 +18,20 @@ logger = get_logger(__name__)
 async def lifespan(app: FastAPI):
     """Application lifespan events"""
     # Startup
+    logger.info("="*50)
     logger.info("Application starting up...")
+    logger.info(f"App Name: {settings.APP_NAME}")
+    logger.info(f"App Version: {settings.APP_VERSION}")
+    logger.info(f"Debug Mode: {settings.DEBUG}")
+    logger.info(f"Database: {settings.DATABASE_URL}")
+    logger.info("="*50)
     Base.metadata.create_all(bind=engine)
+    logger.info("Database tables created successfully")
     yield
     # Shutdown
+    logger.info("="*50)
     logger.info("Application shutting down...")
+    logger.info("="*50)
 
 
 app = FastAPI(
@@ -30,6 +40,9 @@ app = FastAPI(
     debug=settings.DEBUG,
     lifespan=lifespan,
 )
+
+# Add logging middleware
+app.add_middleware(LoggingMiddleware)
 
 # CORS Middleware
 app.add_middleware(
@@ -59,6 +72,7 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Health check endpoint"""
+    logger.debug("Health check requested")
     return {"status": "healthy"}
 
 

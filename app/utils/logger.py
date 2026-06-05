@@ -1,23 +1,33 @@
 """Logger Utility"""
 import logging
-import sys
-from app.config import settings
+from app.utils.logging_config import setup_logging
+
+# Initialize logging
+setup_logging()
 
 
 def get_logger(name: str) -> logging.Logger:
-    """Get configured logger"""
-    logger = logging.getLogger(name)
-    logger.setLevel(settings.LOG_LEVEL)
+    """Get logger instance
 
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(settings.LOG_LEVEL)
+    Args:
+        name: Logger name (typically __name__)
 
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    handler.setFormatter(formatter)
+    Returns:
+        Configured logger instance
+    """
+    return logging.getLogger(name)
 
-    if not logger.handlers:
-        logger.addHandler(handler)
 
-    return logger
+def get_app_logger() -> logging.Logger:
+    """Get application logger"""
+    return logging.getLogger("app")
+
+
+def get_database_logger() -> logging.Logger:
+    """Get database logger"""
+    return logging.getLogger("app.database")
+
+
+def get_api_logger() -> logging.Logger:
+    """Get API logger"""
+    return logging.getLogger("app.api")
