@@ -1,0 +1,23 @@
+"""Core Constants"""
+# Order status constants
+ORDER_STATUS_PENDING = "pending"
+ORDER_STATUS_CONFIRMED = "confirmed"
+ORDER_STATUS_SHIPPED = "shipped"
+ORDER_STATUS_DELIVERED = "delivered"
+
+ORDER_STATUSES = [
+    ORDER_STATUS_PENDING,
+    ORDER_STATUS_CONFIRMED,
+    ORDER_STATUS_SHIPPED,
+    ORDER_STATUS_DELIVERED,
+]
+
+# User role constants
+USER_ROLE_ADMIN = "admin"
+USER_ROLE_USER = "user"
+
+USER_ROLES = [USER_ROLE_ADMIN, USER_ROLE_USER]
+
+# API constants
+API_V1_PREFIX = "/api/v1"
+API_V2_PREFIX = "/api/v2"
