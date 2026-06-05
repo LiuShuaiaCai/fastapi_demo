@@ -14,6 +14,7 @@ A complete, production-ready FastAPI template with authentication, database inte
 - ✅ Unit testing with Pytest
 - ✅ Environment configuration management
 - ✅ Request/Response validation with Pydantic
+- ✅ **uv package manager** for fast dependency management
 
 ## Project Structure
 
@@ -33,31 +34,47 @@ fastapi_demo/
 │   ├── dependencies.py    # FastAPI dependencies
 │   └── main.py            # Application entry
 ├── tests/                 # Unit tests
-├── requirements.txt       # Python dependencies
-├── Dockerfile             # Docker image config
+├── pyproject.toml         # UV & project configuration
+├── .python-version        # Python version
+├── .env.example           # Environment variables example
 └── README.md
 ```
 
-## Installation
+## Prerequisites
 
-### 1. Clone the repository
+- Python 3.11+
+- [uv](https://github.com/astral-sh/uv) package manager
+
+## Installation with uv
+
+### 1. Install uv (if not already installed)
+
+```bash
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows (using PowerShell)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# Or using pip
+pip install uv
+```
+
+### 2. Clone the repository
 
 ```bash
 git clone https://github.com/LiuShuaiaCai/fastapi_demo.git
 cd fastapi_demo
 ```
 
-### 2. Create virtual environment
+### 3. Install dependencies with uv
 
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+# Install production dependencies
+uv sync
 
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
+# Install with dev dependencies
+uv sync --all-extras
 ```
 
 ### 4. Setup environment variables
@@ -70,10 +87,14 @@ Edit `.env` file with your settings.
 
 ## Running the Application
 
-### Using Uvicorn (Development)
+### Using uv
 
 ```bash
-uvicorn app.main:app --reload
+# Run with uvicorn
+uv run uvicorn app.main:app --reload
+
+# Or directly with the app module
+uv run python -m uvicorn app.main:app --reload
 ```
 
 The API will be available at: `http://localhost:8000`
@@ -105,16 +126,20 @@ docker-compose up
 
 ## Testing
 
-Run tests with Pytest:
+Run tests with uv:
 
 ```bash
-pytest
-```
+# Run all tests
+uv run pytest
 
-Run tests with coverage:
+# Run with coverage
+uv run pytest --cov=app
 
-```bash
-pytest --cov=app
+# Run specific test file
+uv run pytest tests/test_auth.py
+
+# Run tests in watch mode
+uv run pytest --tb=short -v
 ```
 
 ## Database
@@ -128,8 +153,28 @@ The template uses SQLite by default. To use PostgreSQL:
 
 2. Install PostgreSQL driver:
    ```bash
-   pip install psycopg2-binary
+   uv pip install psycopg2-binary
    ```
+
+## Code Quality Tools
+
+### Format Code with Black
+
+```bash
+uv run black app/ tests/
+```
+
+### Lint Code with Ruff
+
+```bash
+uv run ruff check app/ tests/
+```
+
+### Type Checking with MyPy
+
+```bash
+uv run mypy app/
+```
 
 ## Example API Usage
 
@@ -201,7 +246,47 @@ class Product(Base):
 - Always validate and sanitize input
 - Use HTTPS in production
 - Implement rate limiting
-- Keep dependencies updated
+- Keep dependencies updated with `uv sync`
+
+## uv Commands Quick Reference
+
+```bash
+# Install dependencies
+uv sync
+
+# Install with dev dependencies
+uv sync --all-extras
+
+# Add a new dependency
+uv add package-name
+
+# Add a dev dependency
+uv add --dev package-name
+
+# Remove a dependency
+uv remove package-name
+
+# Update all dependencies
+uv sync --upgrade
+
+# Run a command in the virtual environment
+uv run command
+
+# Create a virtual environment
+uv venv
+
+# Activate virtual environment
+source .venv/bin/activate  # macOS/Linux
+.venv\Scripts\activate     # Windows
+```
+
+## Benefits of uv
+
+- ⚡ **10-100x faster** than pip for dependency resolution
+- 🔒 **Deterministic** lock file for reproducible builds
+- 📦 **Single tool** for dependency management and virtual environments
+- 🚀 **Zero runtime dependencies** - single compiled binary
+- 🔄 **Built-in` lock file** (uv.lock) for version pinning
 
 ## License
 
