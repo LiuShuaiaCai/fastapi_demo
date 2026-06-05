@@ -7,7 +7,7 @@ A complete, production-ready FastAPI template with authentication, database inte
 - ✅ FastAPI framework with async support
 - ✅ SQLAlchemy ORM integration
 - ✅ JWT Authentication (login/register)
-- ✅ User management endpoints
+- ✅ User, Product, and Order management
 - ✅ **Complete Logging System** with file rotation
 - ✅ Error handling and middleware
 - ✅ CORS middleware configuration
@@ -16,40 +16,111 @@ A complete, production-ready FastAPI template with authentication, database inte
 - ✅ Environment configuration management
 - ✅ Request/Response validation with Pydantic
 - ✅ **uv package manager** for fast dependency management
+- ✅ Multi-version API support (v1, v2)
+- ✅ Database migration ready (Alembic)
 
 ## Project Structure
 
 ```
-fastapi_demo/
+fastapi-demo/
 ├── app/
-│   ├── api/v1/
-│   │   ├── endpoints/     # API endpoints
-│   │   └── router.py      # Route aggregation
-│   ├── models/            # SQLAlchemy models
-│   ├── schemas/           # Pydantic schemas
-│   ├── services/          # Business logic
-│   ├── database/          # Database configuration
+│   ├── __init__.py
+│   ├── main.py                 # 应用入口
+│   ├── config.py               # 配置管理
+│   ├── dependencies.py         # 依赖注入
+│   │
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── v1/
+│   │   │   ├── __init__.py
+│   │   │   ├── endpoints/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── auth.py       # 认证端点
+│   │   │   │   ├── users.py      # 用户端点
+│   │   │   │   ├── products.py   # 产品端点
+│   │   │   │   └── orders.py     # 订单端点
+│   │   │   └── router.py         # v1 路由汇总
+│   │   └── v2/
+│   │       ├── __init__.py
+│   │       ├── endpoints/
+│   │       │   ├── __init__.py
+│   │       │   └── users.py      # 用户端点 (v2)
+│   │       └── router.py         # v2 路由汇总
+│   │
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── base.py              # 基础模型
+│   │   ├── user.py              # 用户数据模型
+│   │   ├── product.py           # 产品数据模型
+│   │   └── order.py             # 订单数据模型
+│   │
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   ├── user.py              # Pydantic 用户模型
+│   │   ├── product.py           # Pydantic 产品模型
+│   │   └── order.py             # Pydantic 订单模型
+│   │
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── user_service.py      # 用户业务逻辑
+│   │   ├── product_service.py   # 产品业务逻辑
+│   │   └── order_service.py     # 订单业务逻辑
+│   │
+│   ├── database/
+│   │   ├── __init__.py
+│   │   ├── base.py              # 数据库基础配置
+│   │   ├── session.py           # 数据库会话
+│   │   └── init_db.py           # 初始化数据库
+│   │
 │   ├── middleware/
-│   │   ├── error_handler.py       # Error handling
-│   │   └── logging_middleware.py  # HTTP logging
+│   │   ├── __init__.py
+│   │   ├── error_handler.py     # 错误处理中间件
+│   │   └── logging_middleware.py # HTTP 日志中间件
+│   │
 │   ├── utils/
-│   │   ├── logger.py              # Logger initialization
-│   │   ├── logging_config.py      # Logging configuration
-│   │   ├── logging_formatter.py   # JSON formatter
-│   │   └── security.py
-│   ├── config.py          # Configuration
-│   ├── dependencies.py    # FastAPI dependencies
-│   └── main.py            # Application entry
-├── logs/                  # Log files (auto-created)
-│   ├── debug.log          # Debug level logs
-│   ├── info.log           # Info level logs
-│   ├── error.log          # Error level logs
-│   └── app.log            # Application logs
-├── tests/                 # Unit tests
-├── pyproject.toml         # UV & project configuration
-├── .python-version        # Python version
-├── .env.example           # Environment variables example
-└── README.md
+│   │   ├── __init__.py
+│   │   ├── logger.py            # 日志工具
+│   │   ├── logging_config.py    # 日志配置
+│   │   ├── logging_formatter.py # JSON 日志格式化
+│   │   ├── security.py          # 安全工具
+│   │   ├── validators.py        # 验证工具
+│   │   └── helpers.py           # 辅助函数
+│   │
+│   └── core/
+│       ├── __init__.py
+│       ├── security.py          # 认证授权
+│       └── constants.py         # 常量定义
+│
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py              # Pytest 配置
+│   ├── test_auth.py             # 认证测试
+│   ├── test_users.py            # 用户测试
+│   ├── test_products.py         # 产品测试
+│   └── test_orders.py           # 订单测试
+│
+├── migrations/                  # Alembic 数据库迁移
+│   ├── env.py
+│   └── versions/
+│       └── __init__.py
+│
+├── logs/                        # 日志文件目录 (自动创建)
+│   ├── debug.log                # 调试日志
+│   ├── info.log                 # 信息日志
+│   ├── error.log                # 错误日志
+│   └── app.log                  # 应用日志
+│
+├── pyproject.toml               # UV & 项目配置
+├── .python-version              # Python 版本
+├── .env                         # 环境变量配置 (勿提交)
+├── .env.example                 # 环境变量示例
+├── .gitignore
+├── .dockerignore
+├── alembic.ini                  # Alembic 配置
+├── Dockerfile                   # Docker 容器配置
+├── docker-compose.yml           # Docker Compose 配置
+├── pytest.ini                   # Pytest 配置
+└── README.md                    # 项目说明
 ```
 
 ## Logging System
@@ -88,7 +159,7 @@ LOGGING_CONFIG = {
 - 📝 **Multiple Log Levels**: DEBUG, INFO, WARNING, ERROR, CRITICAL
 - 🔄 **Rotating File Handlers**: Automatically rotates logs when they reach 10MB
 - 📊 **Structured Logging**: JSON format support for structured logs
-- 🎯 **Logger Hierarchy**: Separate loggers for app, database, API, and services
+- 🏛️ **Logger Hierarchy**: Separate loggers for app, database, API, and services
 - 🌐 **HTTP Logging**: Middleware logs all HTTP requests and responses
 - ⚡ **Performance Tracking**: Response time tracking with `X-Process-Time` header
 - 🔍 **Error Tracking**: Full exception stack traces logged
@@ -111,27 +182,6 @@ logger.info("Info message")
 logger.warning("Warning message")
 logger.error("Error message", exc_info=True)
 logger.critical("Critical message")
-```
-
-### Log Format Examples
-
-**Verbose Format**:
-```
-2024-01-15 10:30:45,123 - app.services.user_service - ERROR - [user_service.py:45] - Failed to create user
-```
-
-**Simple Format**:
-```
-2024-01-15 10:30:45,123 - app.api.v1.endpoints.users - INFO - User registration successful
-```
-
-### Environment Configuration
-
-Control logging level via `.env`:
-
-```env
-# LOG_LEVEL can be: DEBUG, INFO, WARNING, ERROR, CRITICAL
-LOG_LEVEL=INFO
 ```
 
 ## Prerequisites
@@ -195,21 +245,41 @@ docker-compose up
 
 ## API Endpoints
 
-### Authentication
+### API v1 Endpoints
 
+#### Authentication
 - `POST /api/v1/auth/register` - Register new user
 - `POST /api/v1/auth/login` - Login and get access token
 
-### Users
-
+#### Users
 - `GET /api/v1/users/` - Get all users
 - `GET /api/v1/users/{user_id}` - Get user by ID
 - `GET /api/v1/users/me` - Get current user (requires authentication)
 
-### Health
+#### Products
+- `POST /api/v1/products/` - Create new product
+- `GET /api/v1/products/` - Get all products
+- `GET /api/v1/products/{product_id}` - Get product by ID
+- `PUT /api/v1/products/{product_id}` - Update product
+- `DELETE /api/v1/products/{product_id}` - Delete product
 
+#### Orders
+- `POST /api/v1/orders/` - Create new order
+- `GET /api/v1/orders/` - Get all orders
+- `GET /api/v1/orders/{order_id}` - Get order by ID
+- `PUT /api/v1/orders/{order_id}` - Update order
+- `DELETE /api/v1/orders/{order_id}` - Delete order
+
+#### Health
 - `GET /health` - Health check
 - `GET /` - Welcome message
+
+### API v2 Endpoints
+
+#### Users (Enhanced)
+- `GET /api/v2/users/` - Get all users (v2)
+- `GET /api/v2/users/{user_id}` - Get user by ID (v2)
+- `GET /api/v2/users/me` - Get current user (v2)
 
 ## Testing
 
@@ -259,6 +329,31 @@ The template uses SQLite by default. To use PostgreSQL:
    uv add psycopg2-binary
    ```
 
+### Database Initialization
+
+The application automatically creates tables on startup. To initialize with sample data:
+
+```python
+from app.database.session import SessionLocal
+from app.database.init_db import init_db
+
+db = SessionLocal()
+init_db(db)
+```
+
+### Database Migrations (Alembic)
+
+```bash
+# Generate a new migration
+uv run alembic revision --autogenerate -m "Add user table"
+
+# Apply migrations
+uv run alembic upgrade head
+
+# View migration history
+uv run alembic history
+```
+
 ## Code Quality Tools
 
 ### Format Code with Black
@@ -295,6 +390,22 @@ curl -X POST "http://localhost:8000/api/v1/auth/register" \
 curl -X POST "http://localhost:8000/api/v1/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"username": "john", "password": "password123"}'
+```
+
+### Create Product
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/products/" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Laptop", "description": "High performance", "price": 999.99, "stock": 10}'
+```
+
+### Create Order
+
+```bash
+curl -X POST "http://localhost:8000/api/v1/orders/" \
+  -H "Content-Type: application/json" \
+  -d '{"user_id": 1, "product_id": 1, "quantity": 2, "total_price": 1999.98}'
 ```
 
 ### Get Current User (with token)
@@ -334,25 +445,88 @@ LOG_LEVEL=INFO
 
 ### Add New Endpoint
 
-1. Create schema in `app/schemas/`
-2. Create model in `app/models/` if needed
+1. Create schema in `app/schemas/` (if needed)
+2. Create model in `app/models/` (if needed)
 3. Create service in `app/services/`
 4. Create endpoint in `app/api/v1/endpoints/`
 5. Add router to `app/api/v1/router.py`
 6. Add tests in `tests/`
 
-### Add New Model
+### Example: Add New Model
 
 ```python
-# app/models/product.py
-from sqlalchemy import Column, Integer, String, Float
+# app/models/category.py
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.sql import func
 from app.models.base import Base
 
-class Product(Base):
-    __tablename__ = "products"
+class Category(Base):
+    __tablename__ = "categories"
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
-    price = Column(Float, nullable=False)
+    description = Column(String(500))
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+```
+
+### Example: Add New Schema
+
+```python
+# app/schemas/category.py
+from pydantic import BaseModel, Field
+from datetime import datetime
+
+class CategoryCreate(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    description: str = None
+
+class CategoryResponse(CategoryCreate):
+    id: int
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+```
+
+### Example: Add New Service
+
+```python
+# app/services/category_service.py
+from sqlalchemy.orm import Session
+from app.models.category import Category
+
+class CategoryService:
+    @staticmethod
+    def create_category(db: Session, category_data):
+        category = Category(**category_data.dict())
+        db.add(category)
+        db.commit()
+        db.refresh(category)
+        return category
+```
+
+### Example: Add New Endpoint
+
+```python
+# app/api/v1/endpoints/categories.py
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from app.database.session import get_db
+from app.schemas.category import CategoryCreate, CategoryResponse
+from app.services.category_service import CategoryService
+
+router = APIRouter()
+
+@router.post("/", response_model=CategoryResponse)
+async def create_category(data: CategoryCreate, db: Session = Depends(get_db)):
+    return CategoryService.create_category(db, data)
+```
+
+Then add to `app/api/v1/router.py`:
+
+```python
+from app.api.v1.endpoints import categories
+
+router.include_router(categories.router, prefix="/categories", tags=["categories"])
 ```
 
 ## Security
@@ -364,6 +538,33 @@ class Product(Base):
 - Implement rate limiting
 - Keep dependencies updated with `uv sync --upgrade`
 - Review logs regularly for security issues
+- Use strong passwords (minimum 8 characters)
+
+## Utilities
+
+### Validators
+
+```python
+from app.utils.validators import validate_email, validate_username, validate_password
+
+validate_email("user@example.com")  # True
+validate_username("john_doe")       # True
+validate_password("secure123")      # True
+```
+
+### Helpers
+
+```python
+from app.utils.helpers import flatten_dict, paginate
+
+# Flatten nested dictionary
+result = flatten_dict({"user": {"name": "John", "age": 30}})
+# {"user.name": "John", "user.age": 30}
+
+# Paginate items
+data = paginate(items, skip=0, limit=10)
+# {"data": [...], "total": 100, "page": 1, "pages": 10}
+```
 
 ## uv Commands Quick Reference
 
@@ -394,7 +595,7 @@ uv venv
 
 # Activate virtual environment
 source .venv/bin/activate  # macOS/Linux
-.venv\Scripts\activate     # Windows
+.venv\\Scripts\\activate     # Windows
 ```
 
 ## Benefits of uv
@@ -407,6 +608,16 @@ source .venv/bin/activate  # macOS/Linux
 | Zero dependencies | Single compiled binary |
 | Compatible | Supports PEP 517/518 standards |
 
+## Project Statistics
+
+- **Models**: 3 (User, Product, Order)
+- **Endpoints**: 15+ across v1 and v2
+- **Services**: 4 (User, Product, Order, Health)
+- **Tests**: 8+ test files
+- **Log Files**: 4 rotating log files
+- **Utilities**: 4 utility modules
+- **Middleware**: 2 custom middleware
+
 ## License
 
 MIT
@@ -414,3 +625,7 @@ MIT
 ## Support
 
 For issues and questions, please create an issue in the repository.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
